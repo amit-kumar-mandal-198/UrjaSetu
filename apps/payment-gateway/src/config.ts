@@ -4,8 +4,8 @@ import path from 'path';
 dotenv.config({ path: path.resolve(__dirname, '../../../.env') });
 
 export const config = {
-  port: parseInt(process.env.PAYMENT_GATEWAY_PORT || '4002', 10),
-  fastapiUrl: `http://localhost:${process.env.API_PORT || '8000'}`,
+  port: parseInt(process.env.PORT || process.env.PAYMENT_GATEWAY_PORT || '4002', 10),
+  fastapiUrl: process.env.API_URL || `http://localhost:${process.env.API_PORT || '8000'}`,
   x402: {
     network: process.env.X402_NETWORK || 'algorand:testnet',
     scheme: process.env.X402_SCHEME || 'x402',

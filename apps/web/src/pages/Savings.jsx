@@ -3,7 +3,7 @@ import axios from 'axios';
 import { IndianRupee, Leaf, Calendar, ArrowUpRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 
-const API_URL = 'http://localhost:8001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
 const Savings = () => {
   const [data, setData] = useState({ total_savings_today: 0 });

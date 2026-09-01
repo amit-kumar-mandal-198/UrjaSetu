@@ -3,7 +3,7 @@ import axios from 'axios';
 import { CheckCircle, Clock, Zap, Shield, IndianRupee, Cpu } from 'lucide-react';
 import '../index.css';
 
-const API_URL = 'http://localhost:8001';
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
 const Audit = () => {
   const [auditEvents, setAuditEvents] = useState([]);

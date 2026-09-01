@@ -1,8 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CheckCircle, Clock, Zap, Shield, IndianRupee, Cpu } from 'lucide-react';
-import '../index.css';
 import { MOCK_DASHBOARD_DATA } from '../mockData';
+import TopNavigation from '../components/TopNavigation';
+import LoadingSkeleton from '../components/LoadingSkeleton';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
@@ -14,97 +15,92 @@ const Audit = () => {
     const fetchAudit = async () => {
       try {
         const response = await axios.get(`${API_URL}/api/v1/dashboard`, { timeout: 3000 });
-        // We included audit_events in the dashboard endpoint
         setAuditEvents(response.data.audit_events || []);
         setLoading(false);
       } catch (error) {
-        console.warn("Backend not reachable, falling back to mock data for demonstration.");
+        console.warn("Backend not reachable", error);
         setAuditEvents(MOCK_DASHBOARD_DATA.audit_events);
         setLoading(false);
       }
     };
     
     fetchAudit();
-    const interval = setInterval(fetchAudit, 5000); // Polling for timeline updates
+    const interval = setInterval(fetchAudit, 5000); 
     return () => clearInterval(interval);
   }, []);
 
   const getIconForEvent = (eventType) => {
     switch(eventType) {
-      case 'Task Created': return <Clock size={16} />;
-      case 'Optimization Calculated': return <Cpu size={16} />;
-      case 'Payment Required': return <IndianRupee size={16} />;
-      case 'Payment Verified': return <Shield size={16} />;
-      case 'Command Issued': return <Zap size={16} />;
-      case 'Device Executed': return <CheckCircle size={16} />;
-      default: return <Clock size={16} />;
+      case 'Task Created': return <Clock size={20} />;
+      case 'Optimization Calculated': return <Cpu size={20} />;
+      case 'Payment Required': return <IndianRupee size={20} />;
+      case 'Payment Verified': return <Shield size={20} />;
+      case 'Command Issued': return <Zap size={20} />;
+      case 'Device Executed': return <CheckCircle size={20} />;
+      default: return <Clock size={20} />;
     }
   };
 
-  const getColorForEvent = (eventType) => {
-    if (eventType.includes('Payment')) return 'var(--accent-orange)';
-    if (eventType.includes('Executed') || eventType.includes('Verified')) return 'var(--accent-green)';
-    if (eventType.includes('Issued')) return 'var(--accent-blue)';
-    return 'var(--text-muted)';
+  const getColorConfig = (eventType) => {
+    if (eventType.includes('Payment')) return { color: 'var(--color-amber)', bg: 'var(--bg-amber)' };
+    if (eventType.includes('Executed') || eventType.includes('Verified')) return { color: 'var(--color-emerald)', bg: 'var(--bg-emerald)' };
+    if (eventType.includes('Issued') || eventType.includes('Optimization')) return { color: 'var(--color-blue)', bg: 'var(--bg-blue)' };
+    return { color: 'var(--text-muted)', bg: 'var(--bg-card-hover)' };
   };
 
   if (loading) {
     return (
-      <div className="fade-in" style={{ padding: '0 0' }}>
-         <div className="header d-1">
-           <div style={{ width: '100%' }}>
-             <div className="skeleton skeleton-title"></div>
-             <div className="skeleton skeleton-text" style={{ width: '250px' }}></div>
-           </div>
-         </div>
+      <div className="animate-fade-in">
+        <TopNavigation title="Execution Audit" />
+        <div className="bento-grid">
+          <div className="col-span-2">
+             <LoadingSkeleton />
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="fade-in">
-      <div className="header animate-in d-1">
-        <div>
-           <h1 style={{fontSize: '1.75rem', marginBottom: '0.25rem', fontWeight: 700}}>Execution Audit</h1>
-           <p style={{color: 'var(--text-muted)', fontSize: '0.95rem'}}>Cryptographic provenance and strict chronological execution log</p>
-        </div>
-      </div>
+    <div className="animate-fade-in">
+      <TopNavigation title="Execution Audit" />
 
-      <div className="bento-card animate-in d-2" style={{ maxWidth: '800px' }}>
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '2rem', padding: '1rem' }}>
+      <div className="card max-w-3xl">
+        <div className="flex flex-col gap-8 p-4">
           {auditEvents.length === 0 ? (
-            <div style={{ color: 'var(--text-muted)', textAlign: 'center', padding: '2rem' }}>No audit events recorded yet.</div>
+            <div className="text-center py-8 text-muted">No audit events recorded yet.</div>
           ) : (
-            auditEvents.map((event, idx) => (
-              <div key={event.id} style={{ display: 'flex', gap: '1.5rem', position: 'relative' }}>
-                {idx !== auditEvents.length - 1 && (
-                  <div style={{ position: 'absolute', left: '16px', top: '32px', bottom: '-32px', width: '2px', background: 'var(--border-color)' }}></div>
-                )}
-                
-                <div style={{ 
-                  width: '32px', height: '32px', borderRadius: '50%', 
-                  background: getColorForEvent(event.event_type) === 'var(--text-muted)' ? 'var(--bg-card-hover)' : `rgba(255,255,255,0.05)`,
-                  color: getColorForEvent(event.event_type),
-                  display: 'flex', alignItems: 'center', justifyContent: 'center', zIndex: 1,
-                  flexShrink: 0
-                }}>
-                  {getIconForEvent(event.event_type)}
+            auditEvents.map((event, idx) => {
+              const { color, bg } = getColorConfig(event.event_type);
+              
+              return (
+                <div key={event.id} className="flex gap-6 relative">
+                  {idx !== auditEvents.length - 1 && (
+                    <div className="absolute left-6 top-14 bottom-[-2rem] w-0.5 bg-gray-200" style={{ backgroundColor: 'var(--border-color)' }}></div>
+                  )}
+                  
+                  <div 
+                    className="w-12 h-12 rounded-full flex items-center justify-center shrink-0 z-10 border-4 border-white"
+                    style={{ backgroundColor: bg, color: color, borderColor: 'var(--bg-card)' }}
+                  >
+                    {getIconForEvent(event.event_type)}
+                  </div>
+                  
+                  <div className="pb-4 pt-1">
+                     <div className="flex items-baseline gap-4 mb-2">
+                        <div className="font-semibold text-lg">{event.event_type}</div>
+                        <div className="text-sm text-muted">{new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}</div>
+                     </div>
+                     <div className="text-muted mb-3 leading-relaxed">
+                       {event.details}
+                     </div>
+                     <div>
+                        <span className="badge badge-gray border border-gray-200">Task ID: {event.task_id}</span>
+                     </div>
+                  </div>
                 </div>
-                
-                <div style={{ paddingBottom: '1rem' }}>
-                   <div style={{ display: 'flex', alignItems: 'baseline', gap: '1rem', marginBottom: '0.25rem' }}>
-                      <div style={{ fontWeight: 600, fontSize: '1.1rem', color: 'var(--text-main)' }}>{event.event_type}</div>
-                      <div style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>{new Date(event.timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'})}</div>
-                   </div>
-                   <div style={{ color: 'var(--text-muted)', fontSize: '0.95rem', lineHeight: 1.5 }}>
-                     {event.details}
-                   </div>
-                   <div style={{ marginTop: '0.5rem' }}>
-                      <span className="badge" style={{ background: 'var(--bg-color)', color: 'var(--text-muted)', border: '1px solid var(--border-color)', fontSize: '0.7rem' }}>Task ID: {event.task_id}</span>
-                   </div>
-                </div>
-              </div>
-            ))
+              );
+            })
           )}
         </div>
       </div>

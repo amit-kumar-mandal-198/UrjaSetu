@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Sun, Home, Zap, IndianRupee, Cpu, CheckCircle, Bell, ArrowRight, Lock, Wallet, X, AlertTriangle } from 'lucide-react';
@@ -6,6 +6,42 @@ import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianG
 import { MOCK_DASHBOARD_DATA } from '../mockData';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
+
+// 3D Tilt Card Component — tracks mouse position and applies perspective tilt
+const TiltCard = ({ children, className = '', style = {}, depth = 1 }) => {
+  const cardRef = useRef(null);
+
+  const handleMouseMove = useCallback((e) => {
+    const card = cardRef.current;
+    if (!card) return;
+    const rect = card.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const centerX = rect.width / 2;
+    const centerY = rect.height / 2;
+    const rotateX = ((y - centerY) / centerY) * -8; // max 8deg
+    const rotateY = ((x - centerX) / centerX) * 8;
+    card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${depth * 12}px)`;
+  }, [depth]);
+
+  const handleMouseLeave = useCallback(() => {
+    const card = cardRef.current;
+    if (!card) return;
+    card.style.transform = `perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
+  }, []);
+
+  return (
+    <div
+      ref={cardRef}
+      className={`tilt-card ${className}`}
+      style={{ ...style, position: 'relative', overflow: 'hidden' }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+    >
+      {children}
+    </div>
+  );
+};
 
 const Dashboard = () => {
   const [data, setData] = useState({
@@ -199,42 +235,101 @@ const Dashboard = () => {
 
   return (
     <div className="fade-in">
-      <div className="header animate-in d-1">
+      <div style={{
+        display: 'flex',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        marginBottom: '2rem',
+        padding: '1.25rem 1.75rem',
+        background: 'rgba(255, 255, 255, 0.55)',
+        backdropFilter: 'blur(20px)',
+        WebkitBackdropFilter: 'blur(20px)',
+        borderRadius: '20px',
+        border: '1px solid rgba(255, 255, 255, 0.8)',
+        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.04)'
+      }}>
         <div>
-           <h1 style={{fontSize: '1.75rem', marginBottom: '0.25rem', fontWeight: 700}}>Overview</h1>
-           <p style={{color: 'var(--text-muted)', fontSize: '0.95rem'}}>Live energy orchestration and insights</p>
+           <h1 style={{fontSize: '1.8rem', marginBottom: '0.15rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#0f172a'}}>Overview</h1>
+           <p style={{color: '#64748b', fontSize: '0.9rem', fontWeight: 500}}>Live energy orchestration and insights</p>
         </div>
-        <div className="header-actions" style={{ gap: '2rem' }}>
-          <span className="badge">Active Demo</span>
-          <Bell size={20} color="var(--text-muted)" style={{cursor: 'pointer'}} />
-          <div className="user-avatar">
-            JS
+        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          <span style={{
+            padding: '0.4rem 1rem',
+            background: 'linear-gradient(135deg, #10b981, #0ea5e9)',
+            color: 'white',
+            borderRadius: '9999px',
+            fontSize: '0.75rem',
+            fontWeight: 700,
+            letterSpacing: '0.5px',
+            textTransform: 'uppercase',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)'
+          }}>● Active Demo</span>
+          <div style={{
+            position: 'relative',
+            cursor: 'pointer',
+            padding: '0.5rem',
+            borderRadius: '12px',
+            background: 'rgba(255, 255, 255, 0.6)',
+            border: '1px solid rgba(0,0,0,0.06)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}>
+            <Bell size={18} color="#64748b" />
+            <div style={{
+              position: 'absolute', top: '6px', right: '6px',
+              width: '8px', height: '8px', borderRadius: '50%',
+              background: '#ef4444',
+              border: '2px solid white'
+            }}></div>
           </div>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            borderRadius: '50%',
+            background: 'linear-gradient(135deg, #10b981, #0ea5e9)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontWeight: 700,
+            fontSize: '0.85rem',
+            boxShadow: '0 4px 12px rgba(16, 185, 129, 0.3)',
+            cursor: 'pointer'
+          }}>JS</div>
         </div>
       </div>
 
-      <div className="bento-grid" style={{ alignItems: 'stretch' }}>
+      <div className="bento-grid perspective-grid" style={{ alignItems: 'stretch' }}>
         
         {/* Hero Score Card */}
-        <div className="bento-card card-score animate-in d-2">
+        <TiltCard className="bento-card card-score animate-in d-2 depth-1" style={{ gridColumn: 'span 2' }} depth={2}>
            <h3 style={{marginBottom: '1.5rem', color: 'var(--text-main)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>Energy Independence <span className="badge" style={{fontSize: '0.6rem'}}>MEASURED</span></h3>
            
            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '2rem', width: '100%', alignItems: 'center', flexWrap: 'wrap' }}>
              <div style={{ position: 'relative', width: '160px', height: '160px', margin: '0 auto 1.5rem auto' }}>
-                <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: 'rotate(-90deg)' }}>
+                <svg width="160" height="160" viewBox="0 0 160 160" style={{ transform: 'rotate(-90deg)' }} className="neon-gauge">
                   {/* Background track */}
-                  <circle cx="80" cy="80" r={radius} fill="none" stroke="var(--border-color)" strokeWidth="12" />
+                  <circle cx="80" cy="80" r={radius} fill="none" stroke="rgba(16, 185, 129, 0.15)" strokeWidth="14" />
+                  {/* Outer glow ring */}
+                  <circle cx="80" cy="80" r={radius + 4} fill="none" stroke="rgba(16, 185, 129, 0.08)" strokeWidth="2" />
                   {/* Progress */}
                   <circle 
                     cx="80" cy="80" r={radius} 
                     fill="none" 
-                    stroke="var(--accent-green)" 
-                    strokeWidth="12" 
+                    stroke="url(#gaugeGradient)" 
+                    strokeWidth="14" 
                     strokeDasharray={circumference}
                     strokeDashoffset={strokeDashoffset}
                     strokeLinecap="round"
                     style={{ transition: 'stroke-dashoffset 1s ease-in-out' }}
                   />
+                  <defs>
+                    <linearGradient id="gaugeGradient" x1="0" y1="0" x2="1" y2="1">
+                      <stop offset="0%" stopColor="#10b981" />
+                      <stop offset="100%" stopColor="#0ea5e9" />
+                    </linearGradient>
+                  </defs>
                 </svg>
                 <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: '100%', display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center' }}>
                    <span style={{ fontSize: '2.5rem', fontWeight: 600, color: 'var(--text-main)', lineHeight: 1 }}>{independence}%</span>
@@ -275,11 +370,11 @@ const Dashboard = () => {
                 <div style={{ fontSize: '1.1rem', fontWeight: 600, color: 'var(--accent-green)' }}>₹420</div>
               </div>
            </div>
-        </div>
+        </TiltCard>
 
         {/* Live Stats Column */}
-        <div className="bento-card animate-in d-2" style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'transparent', boxShadow: 'none', border: 'none', padding: 0 }}>
-            <div className="bento-card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+        <div className="animate-in d-2 depth-2" style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'transparent', boxShadow: 'none', border: 'none', padding: 0 }}>
+            <TiltCard className="bento-card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }} depth={1}>
               <div className="stat-header" style={{ marginBottom: '0.5rem' }}>
                 <div className="stat-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Solar Yield <span className="badge" style={{fontSize: '0.6rem'}}>MEASURED</span></div>
               </div>
@@ -291,8 +386,8 @@ const Dashboard = () => {
                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Peak Today: <span style={{color:'var(--text-main)', fontWeight:500}}>3.40 kW</span></div>
                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Efficiency: <span style={{color:'var(--accent-green)', fontWeight:500}}>98%</span></div>
               </div>
-            </div>
-            <div className="bento-card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+            </TiltCard>
+            <TiltCard className="bento-card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }} depth={1}>
               <div className="stat-header" style={{ marginBottom: '0.5rem' }}>
                 <div className="stat-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Consumption <span className="badge" style={{fontSize: '0.6rem'}}>ESTIMATED</span></div>
               </div>
@@ -304,11 +399,11 @@ const Dashboard = () => {
                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Base Load: <span style={{color:'var(--text-main)', fontWeight:500}}>0.40 kW</span></div>
                  <div style={{ fontSize: '0.8rem', color: 'var(--text-muted)' }}>Active Loads: <span style={{color:'var(--accent-blue)', fontWeight:500}}>3</span></div>
               </div>
-            </div>
+            </TiltCard>
         </div>
 
         {/* AI Insight Card */}
-        <div className="bento-card card-ai animate-in d-2" style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column' }}>
+        <TiltCard className="bento-card card-ai animate-in d-2 depth-3" style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column' }} depth={1}>
           <div className="ai-header-title">
             <Cpu size={16} /> Autonomous Intelligence
           </div>
@@ -361,10 +456,10 @@ const Dashboard = () => {
               </div>
             </div>
           )}
-        </div>
+        </TiltCard>
 
         {/* Chart Card */}
-        <div className="bento-card card-chart animate-in d-3" style={{ gridColumn: 'span 4' }}>
+        <TiltCard className="bento-card card-chart animate-in d-3 depth-3" style={{ gridColumn: 'span 4' }} depth={0.5}>
           <div className="chart-header">
             <div className="chart-title">Energy Flow Pulse</div>
             <div style={{display: 'flex', gap: '1.5rem', alignItems: 'center', fontSize: '0.9rem', fontWeight: 500}}>
@@ -406,7 +501,7 @@ const Dashboard = () => {
               </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
+        </TiltCard>
 
       </div>
       

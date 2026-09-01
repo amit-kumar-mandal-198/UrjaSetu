@@ -4,6 +4,10 @@ import { IndianRupee, Leaf, Calendar, ArrowUpRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
 import { MOCK_DASHBOARD_DATA } from '../mockData';
 
+import TopNavigation from '../components/TopNavigation';
+import LoadingSkeleton from '../components/LoadingSkeleton';
+import DataSourceBadge from '../components/DataSourceBadge';
+
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
 const Savings = () => {
@@ -17,7 +21,7 @@ const Savings = () => {
         setData(response.data);
         setLoading(false);
       } catch (error) {
-        console.warn("Backend not reachable, falling back to mock data for demonstration.");
+        console.warn("Backend not reachable", error);
         setData(MOCK_DASHBOARD_DATA);
         setLoading(false);
       }
@@ -37,52 +41,62 @@ const Savings = () => {
   ];
 
   if (loading) {
-    return <div style={{ alignItems: 'center', justifyContent: 'center', height: '100%', display: 'flex' }}>Loading Savings Ledger...</div>;
+    return (
+      <div className="animate-fade-in">
+        <TopNavigation title="Savings & Carbon" />
+        <div className="bento-grid">
+          <div className="col-span-2">
+             <LoadingSkeleton type="card" />
+          </div>
+          <div className="col-span-2">
+             <LoadingSkeleton type="card" />
+          </div>
+          <div className="col-span-4 mt-6">
+             <LoadingSkeleton />
+          </div>
+        </div>
+      </div>
+    );
   }
 
   return (
-    <div className="fade-in">
-      <div className="header animate-in d-1">
-        <div>
-           <h1 style={{fontSize: '1.75rem', marginBottom: '0.25rem', fontWeight: 700}}>Savings & Carbon</h1>
-           <p style={{color: 'var(--text-muted)', fontSize: '0.95rem'}}>Transparent proof of your AI optimizer's value</p>
-        </div>
-      </div>
+    <div className="animate-fade-in">
+      <TopNavigation title="Savings & Carbon" />
 
       <div className="bento-grid">
         
         {/* Top Summaries */}
-        <div className="bento-card animate-in d-2" style={{ gridColumn: 'span 2', background: 'linear-gradient(135deg, rgba(0, 245, 212, 0.05) 0%, var(--bg-card) 100%)', borderTop: '4px solid var(--accent-green)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-             <div className="stat-icon green"><IndianRupee size={24} /></div>
-             <h3 style={{ fontSize: '1.1rem', color: 'var(--text-main)', fontWeight: 600 }}>Total Extra Savings (Month)</h3>
+        <div className="card" style={{ gridColumn: 'span 2', borderTop: '4px solid var(--color-emerald)' }}>
+          <div className="flex items-center gap-4 mb-6">
+             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-emerald-100 text-emerald-600" style={{ backgroundColor: 'var(--bg-emerald)', color: 'var(--color-emerald)' }}><IndianRupee size={24} /></div>
+             <h3 className="text-lg font-semibold">Total Extra Savings (Month)</h3>
           </div>
-          <div style={{ fontSize: '3rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>
+          <div className="text-4xl font-bold mb-4">
             ₹{450 + (data?.total_savings_today || 0)}
           </div>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--accent-green)', fontSize: '0.9rem', fontWeight: 500 }}>
+          <div className="flex items-center gap-2 text-sm font-medium" style={{ color: 'var(--color-emerald)' }}>
             <ArrowUpRight size={16} /> +12% compared to standard timer
           </div>
         </div>
 
-        <div className="bento-card animate-in d-2" style={{ gridColumn: 'span 2', animationDelay: '0.1s', background: 'linear-gradient(135deg, rgba(58, 134, 255, 0.05) 0%, var(--bg-card) 100%)', borderTop: '4px solid var(--accent-blue)' }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', marginBottom: '1.5rem' }}>
-             <div className="stat-icon blue"><Leaf size={24} /></div>
-             <h3 style={{ fontSize: '1.1rem', color: 'var(--text-main)', fontWeight: 600 }}>CO2 Emissions Avoided</h3>
+        <div className="card" style={{ gridColumn: 'span 2', borderTop: '4px solid var(--color-teal)' }}>
+          <div className="flex items-center gap-4 mb-6">
+             <div className="w-12 h-12 rounded-xl flex items-center justify-center bg-teal-100 text-teal-600" style={{ backgroundColor: 'var(--bg-teal)', color: 'var(--color-teal)' }}><Leaf size={24} /></div>
+             <h3 className="text-lg font-semibold">CO2 Emissions Avoided</h3>
           </div>
-          <div style={{ fontSize: '3rem', fontWeight: 700, color: 'var(--text-main)', marginBottom: '1rem' }}>
-            18.2 <span style={{fontSize: '1.5rem', color: 'var(--text-muted)', fontWeight: 400}}>kg</span>
+          <div className="text-4xl font-bold mb-4">
+            18.2 <span className="text-2xl text-muted font-normal">kg</span>
           </div>
-          <div style={{ color: 'var(--text-muted)', fontSize: '0.9rem', cursor: 'help', textDecoration: 'underline dotted' }} title="CEA Grid Emission Factor: 0.71 tCO2/MWh (2022-23). Formula: (imported kWh * 0.71)">
+          <div className="text-sm text-muted underline decoration-dotted cursor-help" title="CEA Grid Emission Factor: 0.71 tCO2/MWh (2022-23). Formula: (imported kWh * 0.71)">
             Based on CEA Grid Emission Factor
           </div>
         </div>
 
         {/* History Chart */}
-        <div className="bento-card animate-in d-3" style={{ gridColumn: 'span 4' }}>
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2rem' }}>
-            <h3 style={{ fontSize: '1.25rem', fontWeight: 600 }}>Daily Savings Ledger (INR)</h3>
-            <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--text-main)', fontSize: '0.9rem', background: 'var(--bg-card-hover)', padding: '0.5rem 1rem', borderRadius: '20px', fontWeight: 500 }}>
+        <div className="card" style={{ gridColumn: 'span 4' }}>
+          <div className="flex justify-between items-center mb-8">
+            <h3 className="text-lg font-semibold">Daily Savings Ledger (INR)</h3>
+            <div className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full text-sm font-medium" style={{ backgroundColor: 'var(--bg-card-hover)' }}>
               <Calendar size={16} /> This Week
             </div>
           </div>
@@ -95,57 +109,63 @@ const Savings = () => {
                 <YAxis axisLine={false} tickLine={false} tick={{fill: 'var(--text-muted)', fontWeight: 500}} />
                 <Tooltip 
                   cursor={{fill: 'var(--bg-card-hover)'}}
-                  contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: 'var(--glass-shadow)' }}
+                  contentStyle={{ backgroundColor: 'var(--bg-card)', border: '1px solid var(--border-color)', borderRadius: '12px', boxShadow: 'var(--shadow-restrained)' }}
                   itemStyle={{ color: 'var(--text-main)', fontWeight: 600 }}
                 />
-                <Bar dataKey="baseline" name="Baseline Cost" fill="var(--border-highlight)" radius={[4, 4, 0, 0]} />
-                <Bar dataKey="optimized" name="Optimized Cost" fill="var(--accent-green)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="baseline" name="Baseline Cost" fill="var(--text-muted)" radius={[4, 4, 0, 0]} />
+                <Bar dataKey="optimized" name="Optimized Cost" fill="var(--color-emerald)" radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
 
         {/* Recent Receipts Log */}
-        <div className="bento-card animate-in d-4" style={{ gridColumn: 'span 4' }}>
-          <h3 style={{ fontSize: '1.25rem', marginBottom: '1.5rem', fontWeight: 600 }}>Verified Savings Receipts</h3>
-          <table className="table">
-            <thead>
-              <tr>
-                <th>Receipt ID</th>
-                <th>Task</th>
-                <th>Shift Type</th>
-                <th>Calculated Saving</th>
-                <th>Network (Asset)</th>
-                <th>TxID (Provenance)</th>
-                <th>Verification</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr>
-                <td style={{ color: 'var(--text-muted)' }}>#URJ-9821</td>
-                <td style={{ color: 'var(--text-main)', fontWeight: 500 }}>Water Pump (30 min)</td>
-                <td>Solar Surplus match</td>
-                <td style={{ color: 'var(--accent-green)', fontWeight: 600 }}>₹{(data?.total_savings_today || 0)}</td>
-                <td>Algorand Testnet (ALGO)</td>
-                <td><span style={{fontFamily: 'monospace', fontSize: '0.8rem', background: 'var(--bg-card-hover)', padding: '0.2rem 0.4rem', borderRadius: '4px'}}>ALG-A9F3K2B</span></td>
-                <td>
-                   <div style={{display: 'flex', flexDirection: 'column', gap: '0.4rem'}}>
-                     <span className="badge" style={{background: 'rgba(0, 245, 212, 0.1)', color: 'var(--accent-green)', border: '1px solid rgba(0, 245, 212, 0.2)', alignSelf: 'flex-start', display: 'inline-block', width: 'fit-content'}}>SETTLED</span>
-                     <a href="https://lora.algokit.io/testnet/transaction/ALG-A9F3K2B" target="_blank" rel="noreferrer" style={{fontSize: '0.8rem', color: 'var(--accent-blue)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '0.2rem'}}>Lora Testnet <ArrowUpRight size={12}/></a>
-                   </div>
-                </td>
-              </tr>
-              <tr>
-                <td style={{ color: 'var(--text-muted)' }}>#URJ-9820</td>
-                <td style={{ color: 'var(--text-main)', fontWeight: 500 }}>EV Charger (1 hr)</td>
-                <td>Avoided Peak Tariff</td>
-                <td style={{ color: 'var(--accent-green)', fontWeight: 600 }}>₹14.00</td>
-                <td>Algorand Testnet (ALGO)</td>
-                <td><span style={{fontFamily: 'monospace', fontSize: '0.8rem', background: 'var(--bg-card-hover)', padding: '0.2rem 0.4rem', borderRadius: '4px'}}>ALG-82NF7W</span></td>
-                <td><span className="badge" style={{background: 'rgba(0, 245, 212, 0.1)', color: 'var(--accent-green)', border: '1px solid rgba(0, 245, 212, 0.2)'}}>SETTLED</span></td>
-              </tr>
-            </tbody>
-          </table>
+        <div className="card" style={{ gridColumn: 'span 4' }}>
+          <div className="flex justify-between items-center mb-6">
+            <h3 className="text-lg font-semibold">Verified Savings Receipts</h3>
+            <DataSourceBadge type="Verified" />
+          </div>
+          
+          <div className="overflow-x-auto">
+            <table className="w-full text-left border-collapse">
+              <thead>
+                <tr>
+                  <th className="pb-4 pt-2 border-b border-gray-200 text-sm font-semibold text-muted uppercase tracking-wider">Receipt ID</th>
+                  <th className="pb-4 pt-2 border-b border-gray-200 text-sm font-semibold text-muted uppercase tracking-wider">Task</th>
+                  <th className="pb-4 pt-2 border-b border-gray-200 text-sm font-semibold text-muted uppercase tracking-wider">Shift Type</th>
+                  <th className="pb-4 pt-2 border-b border-gray-200 text-sm font-semibold text-muted uppercase tracking-wider">Calculated Saving</th>
+                  <th className="pb-4 pt-2 border-b border-gray-200 text-sm font-semibold text-muted uppercase tracking-wider">Network (Asset)</th>
+                  <th className="pb-4 pt-2 border-b border-gray-200 text-sm font-semibold text-muted uppercase tracking-wider">TxID (Provenance)</th>
+                  <th className="pb-4 pt-2 border-b border-gray-200 text-sm font-semibold text-muted uppercase tracking-wider">Verification</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td className="py-4 border-b border-gray-100 text-muted">#URJ-9821</td>
+                  <td className="py-4 border-b border-gray-100 font-medium">Water Pump (30 min)</td>
+                  <td className="py-4 border-b border-gray-100">Solar Surplus match</td>
+                  <td className="py-4 border-b border-gray-100 font-semibold" style={{ color: 'var(--color-emerald)' }}>₹{(data?.total_savings_today || 0)}</td>
+                  <td className="py-4 border-b border-gray-100">Algorand Testnet (ALGO)</td>
+                  <td className="py-4 border-b border-gray-100"><span className="px-2 py-1 bg-gray-100 rounded text-sm font-mono" style={{ backgroundColor: 'var(--bg-card-hover)' }}>ALG-A9F3K2B</span></td>
+                  <td className="py-4 border-b border-gray-100">
+                     <div className="flex flex-col gap-2">
+                       <span className="px-2 py-1 text-xs font-semibold rounded uppercase w-fit" style={{ backgroundColor: 'var(--bg-emerald)', color: 'var(--color-emerald)' }}>Settled</span>
+                       <a href="https://lora.algokit.io/testnet/transaction/ALG-A9F3K2B" target="_blank" rel="noreferrer" className="text-xs flex items-center gap-1 hover:underline" style={{ color: 'var(--color-blue)' }}>Lora Testnet <ArrowUpRight size={12}/></a>
+                     </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td className="py-4 border-b border-gray-100 text-muted">#URJ-9820</td>
+                  <td className="py-4 border-b border-gray-100 font-medium">EV Charger (1 hr)</td>
+                  <td className="py-4 border-b border-gray-100">Avoided Peak Tariff</td>
+                  <td className="py-4 border-b border-gray-100 font-semibold" style={{ color: 'var(--color-emerald)' }}>₹14.00</td>
+                  <td className="py-4 border-b border-gray-100">Algorand Testnet (ALGO)</td>
+                  <td className="py-4 border-b border-gray-100"><span className="px-2 py-1 bg-gray-100 rounded text-sm font-mono" style={{ backgroundColor: 'var(--bg-card-hover)' }}>ALG-82NF7W</span></td>
+                  <td className="py-4 border-b border-gray-100"><span className="px-2 py-1 text-xs font-semibold rounded uppercase" style={{ backgroundColor: 'var(--bg-emerald)', color: 'var(--color-emerald)' }}>Settled</span></td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>

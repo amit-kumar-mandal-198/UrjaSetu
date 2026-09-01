@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Sun, Home, Cpu, WifiOff, Wifi } from 'lucide-react';
+import { MOCK_DASHBOARD_DATA } from '../mockData';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
@@ -9,6 +10,21 @@ const DemoController = () => {
   const [home, setHome] = useState(1.6);
   const [status, setStatus] = useState('Idle');
   const [networkConnected, setNetworkConnected] = useState(true);
+
+  // Fallback to fetch data to check if backend is alive
+  useEffect(() => {
+    const fetchStatus = async () => {
+      try {
+        await axios.get(`${API_URL}/api/v1/dashboard`);
+        setNetworkConnected(true);
+      } catch (error) {
+        setNetworkConnected(false);
+      }
+    };
+    fetchStatus();
+    const interval = setInterval(fetchStatus, 5000);
+    return () => clearInterval(interval);
+  }, []);
 
   const gridImport = Math.max(0, home - solar).toFixed(2);
   const gridExport = Math.max(0, solar - home).toFixed(2);

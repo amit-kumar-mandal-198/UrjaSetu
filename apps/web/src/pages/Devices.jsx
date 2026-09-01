@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Cpu, Droplets, Power, ShieldCheck, AlertTriangle, Zap } from 'lucide-react';
+import { MOCK_DASHBOARD_DATA } from '../mockData';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
@@ -15,7 +16,9 @@ const Devices = () => {
         setTasks(response.data.tasks || []);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching device data:", error);
+        console.warn("Backend not reachable, falling back to mock data for demonstration.");
+        setTasks(MOCK_DASHBOARD_DATA.tasks);
+        setLoading(false);
       }
     };
     fetchDevices();

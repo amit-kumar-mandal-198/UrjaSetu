@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { CheckCircle, Clock, Zap, Shield, IndianRupee, Cpu } from 'lucide-react';
 import '../index.css';
+import { MOCK_DASHBOARD_DATA } from '../mockData';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
@@ -17,7 +18,9 @@ const Audit = () => {
         setAuditEvents(response.data.audit_events || []);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching audit events:", error);
+        console.warn("Backend not reachable, falling back to mock data for demonstration.");
+        setAuditEvents(MOCK_DASHBOARD_DATA.audit_events);
+        setLoading(false);
       }
     };
     

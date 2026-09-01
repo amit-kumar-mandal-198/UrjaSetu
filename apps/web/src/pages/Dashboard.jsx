@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { Sun, Home, Zap, IndianRupee, Cpu, CheckCircle, Bell, ArrowRight, Lock, Wallet, X, AlertTriangle } from 'lucide-react';
 import { AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, ReferenceLine } from 'recharts';
+import { MOCK_DASHBOARD_DATA } from '../mockData';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 

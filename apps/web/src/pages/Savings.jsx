@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { IndianRupee, Leaf, Calendar, ArrowUpRight } from 'lucide-react';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid } from 'recharts';
+import { MOCK_DASHBOARD_DATA } from '../mockData';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
@@ -16,7 +17,9 @@ const Savings = () => {
         setData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching savings data:", error);
+        console.warn("Backend not reachable, falling back to mock data for demonstration.");
+        setData(MOCK_DASHBOARD_DATA);
+        setLoading(false);
       }
     };
     

@@ -8,10 +8,14 @@ import { MOCK_DASHBOARD_DATA } from '../mockData';
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8001';
 
 // 3D Tilt Card Component — tracks mouse position and applies perspective tilt
+// Disabled on touch devices to prevent scroll jittering
+const isTouchDevice = () => 'ontouchstart' in window || navigator.maxTouchPoints > 0;
+
 const TiltCard = ({ children, className = '', style = {}, depth = 1 }) => {
   const cardRef = useRef(null);
 
   const handleMouseMove = useCallback((e) => {
+    if (isTouchDevice()) return;
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
@@ -19,12 +23,13 @@ const TiltCard = ({ children, className = '', style = {}, depth = 1 }) => {
     const y = e.clientY - rect.top;
     const centerX = rect.width / 2;
     const centerY = rect.height / 2;
-    const rotateX = ((y - centerY) / centerY) * -8; // max 8deg
+    const rotateX = ((y - centerY) / centerY) * -8;
     const rotateY = ((x - centerX) / centerX) * 8;
     card.style.transform = `perspective(800px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) translateZ(${depth * 12}px)`;
   }, [depth]);
 
   const handleMouseLeave = useCallback(() => {
+    if (isTouchDevice()) return;
     const card = cardRef.current;
     if (!card) return;
     card.style.transform = `perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0px)`;
@@ -367,7 +372,7 @@ const Dashboard = () => {
         </TiltCard>
 
         {/* Live Stats Column */}
-        <div className="animate-in d-2 depth-2" style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'transparent', boxShadow: 'none', border: 'none', padding: 0 }}>
+        <div className="animate-in d-2 depth-2 bento-col-1" style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', background: 'transparent', boxShadow: 'none', border: 'none', padding: 0 }}>
             <TiltCard className="bento-card" style={{ flex: 1, display: 'flex', flexDirection: 'column' }} depth={1}>
               <div className="stat-header" style={{ marginBottom: '0.5rem' }}>
                 <div className="stat-title" style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>Solar Yield <span className="badge" style={{fontSize: '0.6rem'}}>MEASURED</span></div>
@@ -397,7 +402,7 @@ const Dashboard = () => {
         </div>
 
         {/* AI Insight Card */}
-        <TiltCard className="bento-card card-ai animate-in d-2 depth-3" style={{ gridColumn: 'span 1', display: 'flex', flexDirection: 'column' }} depth={1}>
+        <TiltCard className="bento-card card-ai animate-in d-2 depth-3 bento-col-1" style={{ display: 'flex', flexDirection: 'column' }} depth={1}>
           <div className="ai-header-title">
             <Cpu size={16} /> Autonomous Intelligence
           </div>
@@ -453,7 +458,7 @@ const Dashboard = () => {
         </TiltCard>
 
         {/* Chart Card */}
-        <TiltCard className="bento-card card-chart animate-in d-3 depth-3" style={{ gridColumn: 'span 4' }} depth={0.5}>
+        <TiltCard className="bento-card card-chart animate-in d-3 depth-3 bento-col-full" depth={0.5}>
           <div className="chart-header">
             <div className="chart-title">Energy Flow Pulse</div>
             <div style={{display: 'flex', gap: '1.5rem', alignItems: 'center', fontSize: '0.9rem', fontWeight: 500}}>

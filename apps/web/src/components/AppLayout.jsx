@@ -41,7 +41,7 @@ const AppLayout = () => {
       </div>
       
       {/* Main Content Area */}
-      <div className="main-content flex-1 min-w-0" style={{ flex: 1, minWidth: 0, padding: '2rem 2.5rem' }}>
+      <div className="main-content flex-1 min-w-0 p-4 sm:p-6 lg:p-10" style={{ flex: 1, minWidth: 0 }}>
         <Outlet />
       </div>
       

@@ -235,16 +235,10 @@ const Dashboard = () => {
 
   return (
     <div className="fade-in">
-      <div style={{
-        display: 'flex',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        marginBottom: '2rem',
-        padding: '1.25rem 1.75rem',
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6 p-4 sm:p-6 rounded-2xl" style={{
         background: 'rgba(255, 255, 255, 0.55)',
         backdropFilter: 'blur(20px)',
         WebkitBackdropFilter: 'blur(20px)',
-        borderRadius: '20px',
         border: '1px solid rgba(255, 255, 255, 0.8)',
         boxShadow: '0 8px 32px rgba(0, 0, 0, 0.04)'
       }}>
@@ -252,7 +246,7 @@ const Dashboard = () => {
            <h1 style={{fontSize: '1.8rem', marginBottom: '0.15rem', fontWeight: 800, letterSpacing: '-0.02em', color: '#0f172a'}}>Overview</h1>
            <p style={{color: '#64748b', fontSize: '0.9rem', fontWeight: 500}}>Live energy orchestration and insights</p>
         </div>
-        <div style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', flexWrap: 'wrap' }}>
           <span style={{
             padding: '0.4rem 1rem',
             background: 'linear-gradient(135deg, #10b981, #0ea5e9)',
@@ -303,7 +297,7 @@ const Dashboard = () => {
       <div className="bento-grid perspective-grid" style={{ alignItems: 'stretch' }}>
         
         {/* Hero Score Card */}
-        <TiltCard className="bento-card card-score animate-in d-2 depth-1" style={{ gridColumn: 'span 2' }} depth={2}>
+        <TiltCard className="bento-card card-score animate-in d-2 depth-1 hero-score-card" depth={2}>
            <h3 style={{marginBottom: '1.5rem', color: 'var(--text-main)', fontSize: '1.1rem', display: 'flex', alignItems: 'center', gap: '0.5rem'}}>Energy Independence <span className="badge" style={{fontSize: '0.6rem'}}>MEASURED</span></h3>
            
            <div style={{ display: 'flex', justifyContent: 'space-between', gap: '2rem', width: '100%', alignItems: 'center', flexWrap: 'wrap' }}>

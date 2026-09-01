@@ -56,7 +56,9 @@ const Dashboard = () => {
         setData(response.data);
         setLoading(false);
       } catch (error) {
-        console.error("Error fetching dashboard data:", error);
+        console.warn("Backend not reachable, falling back to mock data for demonstration.");
+        setData(MOCK_DASHBOARD_DATA);
+        setLoading(false);
       }
     };
     

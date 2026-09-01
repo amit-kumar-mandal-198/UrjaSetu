@@ -12,7 +12,7 @@ const Devices = () => {
   useEffect(() => {
     const fetchDevices = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/dashboard`);
+        const response = await axios.get(`${API_URL}/api/v1/dashboard`, { timeout: 3000 });
         setTasks(response.data.tasks || []);
         setLoading(false);
       } catch (error) {

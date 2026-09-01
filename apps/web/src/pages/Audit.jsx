@@ -13,7 +13,7 @@ const Audit = () => {
   useEffect(() => {
     const fetchAudit = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/dashboard`);
+        const response = await axios.get(`${API_URL}/api/v1/dashboard`, { timeout: 3000 });
         // We included audit_events in the dashboard endpoint
         setAuditEvents(response.data.audit_events || []);
         setLoading(false);

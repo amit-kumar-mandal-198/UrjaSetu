@@ -13,7 +13,7 @@ const Savings = () => {
   useEffect(() => {
     const fetchSavings = async () => {
       try {
-        const response = await axios.get(`${API_URL}/api/v1/dashboard`);
+        const response = await axios.get(`${API_URL}/api/v1/dashboard`, { timeout: 3000 });
         setData(response.data);
         setLoading(false);
       } catch (error) {
